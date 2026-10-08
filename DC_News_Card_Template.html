@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- DC News card v1 (approved 2026-10-07). Filled by 16b via fillTemplate(); every double-brace token is required (empty string when unused).
+     LAYOUT: hero | portrait | split | quote -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700&display=swap');
+  :root { --bg:#0a0a0a; --red:#dd1500; --gold:#f5c800; --pad:56px; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:1080px; height:1350px; background:var(--bg); }
+  .card { position:relative; width:1080px; height:1350px; overflow:hidden; background:var(--bg); }
+
+  /* True hero: clear above 60%, dark only where the text sits */
+  .hero { position:absolute; inset:0; background-size:cover; background-position:center; }
+  .hero.nophoto { background:radial-gradient(circle at 50% 38%, #2a0603 0%, #120302 40%, #0a0a0a 72%); }
+  .shade { position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.18) 10%, rgba(0,0,0,0) 17%),
+      linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,.5) 70%, rgba(0,0,0,.88) 83%, rgba(0,0,0,.97) 100%); }
+
+  /* Hero + Portrait: circular inset under the date */
+  .portrait { position:absolute; top:128px; right:var(--pad); width:300px; text-align:center; display:none; }
+  .portrait .ring { width:300px; height:300px; border-radius:50%; border:6px solid #fff; background-size:cover; background-position:center 30%;
+    box-shadow:0 10px 40px rgba(0,0,0,.55); }
+  .portrait .lab { margin-top:14px; font:700 24px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em; color:var(--gold);
+    text-shadow:0 2px 8px rgba(0,0,0,.95); text-transform:uppercase; }
+  .v-portrait .portrait { display:block; }
+
+  /* Split: two full-height panels under the same light fade */
+  .split { position:absolute; inset:0; display:none; }
+  .split .p { position:absolute; top:0; width:537px; height:1350px; background-size:cover; background-position:center top; }
+  .split .p.l { left:0; } .split .p.r { right:0; }
+  .split .div { position:absolute; left:537px; top:0; width:6px; height:1350px; background:var(--red); }
+  .v-split .split { display:block; } .v-split .hero { display:none; }
+
+  /* Top corners */
+  .mark { position:absolute; top:var(--pad); left:var(--pad); display:flex; align-items:center; gap:14px; color:#fff;
+    font:400 40px/1 'Bebas Neue',sans-serif; letter-spacing:.14em; text-shadow:0 2px 8px rgba(0,0,0,.85); }
+  .mark::before { content:''; width:6px; height:36px; background:var(--red); }
+  .when { position:absolute; top:calc(var(--pad) + 6px); right:var(--pad); font:600 24px/1 'Barlow Condensed',sans-serif;
+    letter-spacing:.16em; color:rgba(255,255,255,.8); text-shadow:0 2px 6px rgba(0,0,0,.9); }
+
+  /* Bottom: place | outcome, headline, name, footer */
+  .text { position:absolute; left:var(--pad); right:var(--pad); bottom:92px; }
+  .meta { display:flex; align-items:center; margin-bottom:14px; font:700 26px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em;
+    color:#fff; text-transform:uppercase; text-shadow:0 2px 6px rgba(0,0,0,.9); }
+  .meta .bar { color:var(--red); margin:0 14px; }
+  .upd { font:700 18px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em; color:#fff; border:2px solid rgba(255,255,255,.85); padding:5px 9px 4px; margin-left:16px; }
+  .kicker { font:700 26px/1.2 'Barlow Condensed',sans-serif; letter-spacing:.12em; color:#e8e8e8; text-transform:uppercase; margin-bottom:12px;
+    text-shadow:0 2px 6px rgba(0,0,0,.9); }
+  h1 { font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:104px; line-height:.96; letter-spacing:.005em; color:#fff;
+    text-shadow:0 4px 18px rgba(0,0,0,.85); }
+  h1 em { font-style:normal; color:var(--gold); }
+  .verdict { display:inline-block; margin-top:16px; background:var(--red); color:#fff; font:700 30px/1 'Barlow Condensed',sans-serif;
+    letter-spacing:.1em; padding:12px 18px 10px; }
+  .name { margin-top:16px; font:700 25px/1 'Barlow Condensed',sans-serif; letter-spacing:.18em; color:var(--gold);
+    text-transform:uppercase; text-shadow:0 2px 8px rgba(0,0,0,.95); }
+  .foot { position:absolute; left:var(--pad); right:var(--pad); bottom:38px; display:flex; justify-content:space-between; align-items:baseline;
+    font:600 19px/1 'Barlow Condensed',sans-serif; letter-spacing:.12em; color:rgba(255,255,255,.62); text-transform:uppercase; }
+  .foot b { color:#fff; font-weight:700; }
+  .upd:empty, .kicker:empty, .verdict:empty, .name:empty, .lab:empty { display:none; }
+</style>
+</head>
+<body>
+<div class="card v-{{LAYOUT}}">
+  <div class="hero" id="hero" data-src="{{HERO_URL}}" style="background-image:url('{{HERO_URL}}');background-position:{{HERO_POS}}"></div>
+  <div class="split"><div class="p l" style="background-image:url('{{SPLIT_L_URL}}')"></div><div class="p r" style="background-image:url('{{SPLIT_R_URL}}')"></div><div class="div"></div></div>
+  <div class="shade"></div>
+  <div class="mark">DARKEST CRIMES</div>
+  <div class="when">{{DATE}}</div>
+  <div class="portrait"><div class="ring" style="background-image:url('{{SECOND_URL}}');background-position:{{SECOND_POS}}"></div><div class="lab">{{SECOND_LABEL}}</div></div>
+  <div class="text" id="text">
+    <div class="meta"><span>{{PLACE}}</span><span class="bar">|</span><span>{{OUTCOME}}</span><span class="upd">{{UPDATE}}</span></div>
+    <div class="kicker">{{KICKER}}</div>
+    <h1 id="h1">{{HEADLINE_HTML}}</h1>
+    <div class="verdict">{{VERDICT_BAR}}</div>
+    <div class="name">{{NAME_LINE}}</div>
+  </div>
+  <div class="foot"><b>@DARKEST.CRIMES</b><span>{{SOURCES}}</span></div>
+</div>
+<script>
+  var hero = document.getElementById('hero');
+  if (!hero.getAttribute('data-src')) hero.className += ' nophoto';
+  // Fit: headline <= 3 lines and the text block <= 400px (bottom ~30% of the frame).
+  document.fonts.ready.then(function () {
+    var h1 = document.getElementById('h1'), text = document.getElementById('text'), fs = 104;
+    function lines() { return Math.round(h1.offsetHeight / (fs * .96)); }
+    while ((lines() > 3 || text.offsetHeight > 400) && fs > 64) { fs -= 2; h1.style.fontSize = fs + 'px'; }
+    document.body.setAttribute('data-ready', '1');
+  });
+</script>
+</body>
+</html>
