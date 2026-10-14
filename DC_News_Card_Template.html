@@ -69,7 +69,9 @@
   .foot { position:absolute; left:var(--pad); right:var(--pad); bottom:38px; display:flex; justify-content:space-between; align-items:baseline;
     font:600 19px/1 'Barlow Condensed',sans-serif; letter-spacing:.12em; color:rgba(255,255,255,.85); text-transform:uppercase; text-shadow:var(--halo); }
   .foot b { color:#fff; font-weight:700; }
-  .upd:empty, .kicker:empty, .verdict:empty, .lab:empty, .meta .who:empty, .tell:has(.tt:empty) { display:none; }
+  .upd:empty, .kicker:empty, .verdict:empty, .lab:empty, .meta .who:empty { display:none; }
+  /* Own rule: a renderer without :has() drops only this line, not every empty-hide above. */
+  .tell:has(.tt:empty) { display:none; }
 </style>
 </head>
 <body>
