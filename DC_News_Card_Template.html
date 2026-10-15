@@ -3,20 +3,18 @@
 <head>
 <meta charset="utf-8">
 <!-- DC News card v2 "The Tell" (approved 2026-10-14). Filled by 16b via fillTemplate(); every double-brace token is required (empty string when unused).
-     LAYOUT: hero | portrait | split | quote. No yellow: DC red only. Bottom scrim tops out at 50% so the photo stays the hero; text carries its own halo. -->
+     LAYOUT: hero | portrait | split | quote. No yellow: DC red only. Bottom scrim tops out at 50% so the photo stays the hero; text carries tight drop shadows. -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@600;700&display=swap');
   :root { --bg:#0a0a0a; --red:#c42a1c; --red2:#9c1c1c; --hot:#ff6a55; --pad:56px;
-    --halo:0 0 14px rgba(0,0,0,.9), 0 2px 4px rgba(0,0,0,.95); }
+    --halo:0 2px 0 rgba(0,0,0,.55), 0 3px 10px rgba(0,0,0,.7); }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { width:1080px; height:1350px; background:var(--bg); }
   .card { position:relative; width:1080px; height:1350px; overflow:hidden; background:var(--bg); }
 
-  /* True hero, with a subtle "evidence photo" treatment: slightly cooled, fine grain, corner marks */
-  .hero { position:absolute; inset:0; background-size:cover; background-position:center; filter:grayscale(.35) contrast(1.06); }
+  /* True hero, untouched but for a touch of contrast (crisp after platform compression); evidence corner marks */
+  .hero { position:absolute; inset:0; background-size:cover; background-position:center; filter:contrast(1.04) saturate(1.04); }
   .hero.nophoto { background:radial-gradient(circle at 50% 38%, #2a0603 0%, #120302 40%, #0a0a0a 72%); filter:none; }
-  .grain { position:absolute; inset:0; opacity:.13; mix-blend-mode:overlay;
-    background-image:repeating-radial-gradient(circle at 17% 32%, rgba(255,255,255,.5) 0 1px, transparent 1px 3px); }
   .shade { position:absolute; inset:0;
     background:
       linear-gradient(180deg, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 16%),
@@ -36,7 +34,7 @@
 
   /* Split: two full-height panels under the same light fade */
   .split { position:absolute; inset:0; display:none; }
-  .split .p { position:absolute; top:0; width:537px; height:1350px; background-size:cover; background-position:center top; filter:grayscale(.35) contrast(1.06); }
+  .split .p { position:absolute; top:0; width:537px; height:1350px; background-size:cover; background-position:center top; filter:contrast(1.04) saturate(1.04); }
   .split .p.l { left:0; } .split .p.r { right:0; }
   .split .div { position:absolute; left:537px; top:0; width:6px; height:1350px; background:var(--red); }
   .v-split .split { display:block; } .v-split .hero { display:none; }
@@ -50,20 +48,22 @@
 
   /* Bottom: PLACE | OUTCOME | NAME, headline, the tell, footer */
   .text { position:absolute; left:var(--pad); right:var(--pad); bottom:92px; }
-  .meta { display:flex; flex-wrap:wrap; align-items:center; margin-bottom:16px; font:700 27px/1.25 'Barlow Condensed',sans-serif; letter-spacing:.16em;
+  .meta { display:flex; flex-wrap:wrap; align-items:center; margin-bottom:14px; font:700 27px/1.25 'Barlow Condensed',sans-serif; letter-spacing:.16em;
     color:#fff; text-transform:uppercase; text-shadow:var(--halo); }
   .meta .bar { color:var(--red); margin:0 12px; }
-  .meta .who { color:var(--hot); }
+  .meta .who { color:#fff; }
   .meta .who::before { content:'|'; color:var(--red); margin:0 12px; }
   .upd { font:700 18px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em; color:#fff; border:2px solid rgba(255,255,255,.85); padding:5px 9px 4px; margin-left:16px; }
   .kicker { font:700 26px/1.2 'Barlow Condensed',sans-serif; letter-spacing:.12em; color:#eee; text-transform:uppercase; margin-bottom:12px;
     text-shadow:var(--halo); }
-  h1 { font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:104px; line-height:.96; letter-spacing:.005em; color:#fff;
-    text-shadow:0 0 30px rgba(0,0,0,.85), 0 3px 8px rgba(0,0,0,.9); }
-  h1 em { font-style:normal; color:var(--hot); }
+  h1 { font-family:'Bebas Neue',sans-serif; font-weight:400; font-size:104px; line-height:1.02; letter-spacing:.005em; color:#fff;
+    text-shadow:0 3px 0 rgba(0,0,0,.45), 0 4px 16px rgba(0,0,0,.75); }
+  /* Key phrase: white on a DC-red block sized to the capitals (not the font's line box), so it never touches the line above or below. */
+  h1 em { font-style:normal; color:#fff; text-shadow:none; padding:0 .1em; -webkit-box-decoration-break:clone; box-decoration-break:clone;
+    background:linear-gradient(var(--red), var(--red)) 0 var(--blk-y, 52%) / 100% .84em no-repeat; }
   .verdict { display:inline-block; margin-top:16px; background:var(--red2); color:#fff; font:700 30px/1 'Barlow Condensed',sans-serif;
     letter-spacing:.1em; padding:12px 18px 10px; }
-  .tell { display:flex; align-items:center; gap:16px; margin-top:24px; font:700 36px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em;
+  .tell { display:flex; align-items:center; gap:16px; margin-top:20px; font:700 36px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em;
     color:#fff; text-transform:uppercase; text-shadow:var(--halo); }
   .tell .tl { flex:none; background:var(--red2); padding:10px 15px 8px; text-shadow:none; }
   .foot { position:absolute; left:var(--pad); right:var(--pad); bottom:38px; display:flex; justify-content:space-between; align-items:baseline;
@@ -78,7 +78,6 @@
 <div class="card v-{{LAYOUT}}">
   <div class="hero" id="hero" data-src="{{HERO_URL}}" style="background-image:url('{{HERO_URL}}');background-position:{{HERO_POS}}"></div>
   <div class="split"><div class="p l" style="background-image:url('{{SPLIT_L_URL}}');background-position:{{SPLIT_L_POS}}"></div><div class="p r" style="background-image:url('{{SPLIT_R_URL}}');background-position:{{SPLIT_R_POS}}"></div><div class="div"></div></div>
-  <div class="grain"></div>
   <div class="shade"></div>
   <div class="cr tl"></div><div class="cr br"></div>
   <div class="mark">DARKEST CRIMES</div>
@@ -96,11 +95,14 @@
 <script>
   var hero = document.getElementById('hero');
   if (!hero.getAttribute('data-src')) hero.className += ' nophoto';
-  // Fit: headline <= 3 lines and the text block <= 440px (bottom ~third of the frame, tell included).
+  // Fit: the headline sits on two clean lines when it can (down to 84px); a longer one spills to three (down to 64px).
+  // The text block stays <= 470px (bottom ~third of the frame, tell included).
   document.fonts.ready.then(function () {
     var h1 = document.getElementById('h1'), text = document.getElementById('text'), fs = 104;
-    function lines() { return Math.round(h1.offsetHeight / (fs * .96)); }
-    while ((lines() > 3 || text.offsetHeight > 440) && fs > 64) { fs -= 2; h1.style.fontSize = fs + 'px'; }
+    function lines() { return Math.round(h1.offsetHeight / (fs * 1.02)); }
+    function size(n) { fs = n; h1.style.fontSize = n + 'px'; }
+    while ((lines() > 2 || text.offsetHeight > 470) && fs > 84) size(fs - 2);
+    if (lines() > 2) { size(104); while ((lines() > 3 || text.offsetHeight > 470) && fs > 64) size(fs - 2); }
     document.body.setAttribute('data-ready', '1');
   });
 </script>
