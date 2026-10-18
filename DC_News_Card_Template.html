@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <!-- DC News card v3 "Jinx" (approved 2026-10-17). One file, four renders per story, picked by the SLIDE token:
-     card (hook: pill + headline over the hero), tell (slide 2), payoff (slide 3), proof (the three slides at phone width
-     for the approval message). Filled by 16b via fillTemplate(); every double-brace token is required ('' when unused).
+     card (hook: pill + headline over the hero), tell (slide 2), payoff (slide 3), closer (slide 4: the victim on their own
+     photo, else what next, else the record), proof (the four slides at phone width for the approval message). Filled by
+     16b via fillTemplate(); every double-brace token is required ('' when unused). No inset: the victim has slide 4.
      The house grade is the #dcgrade SVG filter on the hero (near black-and-white, clarity, S-curve, trace split tone),
      plus a vignette and a grain layer. Slides 2 and 3 darken the SAME graded photo by an identical 0.38. No blur anywhere.
      Colours: amber pill #ff7a1a / text #140800; DC red #c42a1c only as the wordmark bar; white type. No yellow. -->
@@ -33,16 +34,6 @@
   /* The event date, top right of every slide (Satiah 2026-10-18: an important detail). */
   .when { position:absolute; top:calc(var(--pad) + 8px); right:var(--pad); font:600 24px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em; color:rgba(255,255,255,.88); text-shadow:var(--halo); }
 
-  /* Portrait: circular inset, graded like the hero */
-  .portrait { position:absolute; top:128px; right:var(--pad); width:300px; text-align:center; display:none; }
-  .portrait .ring { width:300px; height:300px; border-radius:50%; border:6px solid #fff; background-size:cover; background-position:center 30%; filter:url(#dcgrade);
-    box-shadow:0 10px 40px rgba(0,0,0,.55); }
-  .portrait .lab { display:inline-block; margin-top:12px; padding:6px 12px 4px; font:700 24px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em;
-    color:#fff; background:rgba(12,11,10,.72); text-transform:uppercase; }
-  .s-card.v-portrait .portrait { display:block; }
-  /* The inset sits on the side away from the hero's face (INSET_SIDE from lib/slides insetSide). */
-  .inset-left .portrait { left:var(--pad); right:auto; }
-
   /* The one accent: the amber pill */
   .pill { display:inline-block; background:var(--amber); color:var(--ink); font:700 30px/1 'Barlow Condensed',sans-serif; letter-spacing:.16em; padding:11px 16px 9px; margin-bottom:22px; text-transform:uppercase; }
 
@@ -70,7 +61,7 @@
   .s-proof .proof { display:flex; }
   .s-proof .hero, .s-proof .vig, .s-proof .grain, .s-proof .wm, .s-proof .when, .s-proof .count { display:none; }
 
-  .pill:empty, .rec:empty, .count:empty, .lab:empty, .handle:empty, .when:empty { display:none; }
+  .pill:empty, .rec:empty, .count:empty, .handle:empty, .when:empty { display:none; }
 </style>
 </head>
 <body>
@@ -96,14 +87,13 @@
   </filter>
   <filter id="dcgrain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"/></filter>
 </svg>
-<div class="card s-{{SLIDE}} v-{{LAYOUT}} inset-{{INSET_SIDE}}">
+<div class="card s-{{SLIDE}} v-{{LAYOUT}}">
   <div class="hero" id="hero" data-src="{{HERO_URL}}" style="background-image:url('{{HERO_URL}}');background-position:{{HERO_POS}}"></div>
   <div class="vig"></div>
   <div class="grain"></div>
   <div class="fade"></div>
   <div class="wm"><i></i>DARKEST CRIMES</div>
   <div class="when">{{DATE}}</div>
-  <div class="portrait"><div class="ring" style="background-image:url('{{SECOND_URL}}');background-position:{{SECOND_POS}}"></div><div class="lab">{{SECOND_LABEL}}</div></div>
   <div class="block" id="block">
     <div class="pill">{{PILL}}</div>
     <h1 id="h1">{{HEADLINE_HTML}}</h1>
