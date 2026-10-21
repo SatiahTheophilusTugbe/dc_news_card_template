@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <!-- DC News card v3 "Jinx" (approved 2026-10-17). One file, four renders per story, picked by the SLIDE token:
      card (hook: pill + headline over the hero), tell (slide 2), payoff (slide 3), closer (slide 4: the victim on their own
-     photo, else what next, else the record), proof (the four slides at phone width for the approval message). Filled by
-     16b via fillTemplate(); every double-brace token is required ('' when unused). No inset: the victim has slide 4.
+     photo, else what next, else the record), proof (the four slides side by side, local render only). Filled by 16b via
+     fillTemplate(); every double-brace token is required ('' when unused). No inset: the victim has slide 4.
+     SQUARE 1080x1080 since 2026-10-21 (Satiah: a true 2x2 quad on Facebook; Instagram and TikTok show slide 1 in the feed).
+     Closer mode 'face' (CLOSER_MODE, on the victim's own photo): the slide-1 layout, photo at full strength, text low.
      The house grade is the #dcgrade SVG filter on the hero (near black-and-white, clarity, S-curve, trace split tone),
      plus a vignette and a grain layer. Slides 2 and 3 darken the SAME graded photo by an identical 0.38. No blur anywhere.
      Colours: amber pill #ff7a1a / text #140800; DC red #c42a1c only as the wordmark bar; white type. No yellow. -->
@@ -14,12 +16,17 @@
   :root { --bg:#0a0a0a; --red:#c42a1c; --amber:#ff7a1a; --ink:#140800; --pad:64px;
     --halo:0 2px 2px rgba(0,0,0,.6), 0 0 28px rgba(0,0,0,.45); }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { width:1080px; height:1350px; background:var(--bg); }
-  .card { position:relative; width:1080px; height:1350px; overflow:hidden; background:var(--bg); color:#fff; font-family:'Barlow Condensed',sans-serif; }
+  html, body { width:1080px; height:1080px; background:var(--bg); }
+  .card { position:relative; width:1080px; height:1080px; overflow:hidden; background:var(--bg); color:#fff; font-family:'Barlow Condensed',sans-serif; }
 
   /* The hero photo, graded in place. Slides 2 and 3 push the same photo down by the same amount. */
   .hero { position:absolute; inset:0; background-size:cover; background-position:center; filter:url(#dcgrade); }
   .s-tell .hero, .s-payoff .hero, .s-closer .hero { filter:url(#dcgrade) brightness(.38); }
+  /* Closer on the victim's own photo: full-strength photo, the card's fade and bottom block, no mid-block. */
+  .s-closer.m-face .hero { filter:url(#dcgrade); }
+  .s-closer.m-face .fade { display:block; }
+  .s-closer.m-face .mid { display:none; }
+  .s-closer.m-face .cblock { display:block; }
   .hero.nophoto { background:radial-gradient(circle at 50% 38%, #2a0603 0%, #120302 40%, #0a0a0a 72%); filter:none; }
   .vig { position:absolute; inset:0; background:radial-gradient(ellipse 75% 80% at 50% 42%, rgba(0,0,0,0) 55%, rgba(0,0,0,.28) 100%); }
   .grain { position:absolute; inset:0; filter:url(#dcgrain); opacity:.09; mix-blend-mode:overlay; background:#808080; }
@@ -40,6 +47,9 @@
   /* Slide 1: pill + headline, bottom third */
   .block { display:none; position:absolute; left:var(--pad); right:var(--pad); bottom:var(--pad); }
   .s-card .block { display:block; }
+  .card .cblock { display:none; }
+  .cblock .cta { display:block; margin-top:22px; }
+  .s-closer.m-face .count { display:none; }
   h1 { font:400 118px/1.0 'Bebas Neue',sans-serif; letter-spacing:.004em; color:#fff; text-shadow:var(--halo); }
 
   /* Slides 2 and 3: label, line, record */
@@ -57,7 +67,7 @@
 
   /* Proof: the four rendered slides side by side at phone width, scaled to fit 1080 */
   .proof { display:none; position:absolute; inset:0; background:#111; align-items:center; justify-content:center; gap:12px; }
-  .proof img { width:252px; height:315px; object-fit:cover; display:block; background:#000; }
+  .proof img { width:252px; height:252px; object-fit:cover; display:block; background:#000; }
   .s-proof .proof { display:flex; }
   .s-proof .hero, .s-proof .vig, .s-proof .grain, .s-proof .wm, .s-proof .when, .s-proof .count { display:none; }
 
@@ -87,7 +97,7 @@
   </filter>
   <filter id="dcgrain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" stitchTiles="stitch"/><feColorMatrix type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"/></filter>
 </svg>
-<div class="card s-{{SLIDE}} v-{{LAYOUT}}">
+<div class="card s-{{SLIDE}} v-{{LAYOUT}} m-{{CLOSER_MODE}}">
   <div class="hero" id="hero" data-src="{{HERO_URL}}" style="background-image:url('{{HERO_URL}}');background-position:{{HERO_POS}}"></div>
   <div class="vig"></div>
   <div class="grain"></div>
@@ -97,6 +107,11 @@
   <div class="block" id="block">
     <div class="pill">{{PILL}}</div>
     <h1 id="h1">{{HEADLINE_HTML}}</h1>
+  </div>
+  <div class="block cblock" id="cblock">
+    <div class="pill">{{CLOSER_LABEL}}</div>
+    <h1 id="h1c">{{CLOSER_LINE}}</h1>
+    <div class="cta">FULL STORY IN THE CAPTION</div>
   </div>
   <div class="mid" id="mid">
     <div class="pill">{{TELL_LABEL}}{{PAYOFF_LABEL}}{{CLOSER_LABEL}}</div>
@@ -111,18 +126,20 @@
 <script>
   var hero = document.getElementById('hero');
   if (!hero.getAttribute('data-src')) hero.className += ' nophoto';
-  // Fit. Card: the headline starts at 118px and shrinks (72px floor) until it is at most 3 lines and the block is at most
-  // 405px tall (30% of the frame). Slides 2-3: the line starts at 92/100px and shrinks (64px floor) until it is at most 5 lines.
+  // Fit (square frame). Card and closer-face block: the line starts at 118px and shrinks (72px floor) until it is at most
+  // 3 lines and the block is at most 345px tall (32% of the frame). Slides 2-3 and closer-dark: the line starts at
+  // 92/100px and shrinks (64px floor) until it is at most 4 lines.
   document.fonts.ready.then(function () {
-    var h1 = document.getElementById('h1'), block = document.getElementById('block'), fs = 118;
     function lines(el, size, lh) { return Math.round(el.offsetHeight / (size * lh)); }
-    if (h1.textContent.trim()) {
-      while ((lines(h1, fs, 1.0) > 3 || block.offsetHeight > 405) && fs > 72) { fs -= 2; h1.style.fontSize = fs + 'px'; }
-    }
+    [['h1', 'block'], ['h1c', 'cblock']].forEach(function (ids) {
+      var h1 = document.getElementById(ids[0]), block = document.getElementById(ids[1]), fs = 118;
+      if (!h1.textContent.trim()) return;
+      while ((lines(h1, fs, 1.0) > 3 || block.offsetHeight > 345) && fs > 72) { fs -= 2; h1.style.fontSize = fs + 'px'; }
+    });
     var h2 = document.getElementById('h2');
     if (h2.textContent.trim()) {
       var f2 = parseFloat(getComputedStyle(h2).fontSize), lh = parseFloat(getComputedStyle(h2).lineHeight) / f2;
-      while (lines(h2, f2, lh) > 5 && f2 > 64) { f2 -= 2; h2.style.fontSize = f2 + 'px'; }
+      while (lines(h2, f2, lh) > 4 && f2 > 64) { f2 -= 2; h2.style.fontSize = f2 + 'px'; }
     }
     document.body.setAttribute('data-ready', '1');
   });
